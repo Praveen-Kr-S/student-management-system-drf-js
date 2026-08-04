@@ -1,0 +1,62 @@
+from django.shortcuts import render
+from rest_framework.views import APIView
+from .serializers import StudentSerializers
+from .models import Student
+from rest_framework.response import Response
+from rest_framework import status
+
+
+class AddStudent(APIView):
+    def post(self,request):
+        serializer = StudentSerializers(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+
+class AllStudents(APIView):
+    def get(self,request):
+        students = Student.objects.all()
+        serializer = StudentSerializers(students,many=True)
+        return Response(serializer.data,status=status.HTTP_200_OK)
+
+class StudentEdit(APIView):
+    def put(self,request,pk):
+        try:
+            student = Student.objects.get(pk=pk)
+        except Student.DoesNotExist:
+            return Response({"error":"Student not found"},status=status.HTTP_404_NOT_FOUND)
+        serializer = StudentSerializers(student,data=request.data)
+        if serializer.is_valid():   
+            serializer.save()
+            return Response(serializer.data,status=status.HTTP_200_OK)
+        return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+
+class StudentDelete(APIView):
+    def delete(self,request,pk):
+        try:
+            student = Student.objects.get(pk=pk)
+        except Student.DoesNotExist:
+            return Response({"error":"Student not found"},status=status.HTTP_404_NOT_FOUND)
+        student.delete()
+        return Response({"message":"Student deleted successfully"},status=status.HTTP_200_OK)
+
+
+class StudentDetail(APIView):
+
+    def get(self, request, pk):
+
+        try:
+            student = Student.objects.get(pk=pk)
+
+        except Student.DoesNotExist:
+            return Response(
+                {"error": "Student Not Found"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        serializer = StudentSerializers(student)
+
+        return Response(serializer.data)
