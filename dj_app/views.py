@@ -5,8 +5,11 @@ from .models import Student
 from rest_framework.response import Response
 from rest_framework import status
 
+from rest_framework.permissions import IsAuthenticated
+
 
 class AddStudent(APIView):
+    permission_classes = [IsAuthenticated]
     def post(self,request):
         serializer = StudentSerializers(data=request.data)
         if serializer.is_valid():
@@ -16,12 +19,15 @@ class AddStudent(APIView):
 
 
 class AllStudents(APIView):
+
+    permission_classes = [IsAuthenticated]
     def get(self,request):
         students = Student.objects.all()
         serializer = StudentSerializers(students,many=True)
         return Response(serializer.data,status=status.HTTP_200_OK)
 
 class StudentEdit(APIView):
+    permission_classes = [IsAuthenticated]
     def put(self,request,pk):
         try:
             student = Student.objects.get(pk=pk)
@@ -35,6 +41,7 @@ class StudentEdit(APIView):
 
 
 class StudentDelete(APIView):
+    permission_classes = [IsAuthenticated]
     def delete(self,request,pk):
         try:
             student = Student.objects.get(pk=pk)

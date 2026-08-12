@@ -18,36 +18,27 @@ function getStudents(){
         let table = document.getElementById("studentTable");
 
         table.innerHTML = "";
-
+        console.log(data)
         data.forEach(student =>{
 
             table.innerHTML += `
+                
+                <tr>
 
-            <tr>
+                    <td>${student.id}</td>
+                    <td>${student.name}</td>
+                    <td>${student.dept}</td>
+                    <td>${student.phone}</td>
+                    <td>${student.age}</td>
 
-                <td>${student.id}</td>
-                <td>${student.name}</td>
-                <td>${student.dept}</td>
-                <td>${student.phone}</td>
-                <td>${student.age}</td>
+                    <td>
+                        <a href="edit.html?id=${student.id}" class="edit-btn">
+                            Edit
+                        </a>
+                        <button class="delete-btn" onclick="deleteStudent(${student.id})">Delete</button>
+                    </td>
 
-                <td>
-
-                    <a href="edit.html?id=${student.id}" class="edit-btn">
-                        Edit
-                    </a>
-
-                    <button
-                        class="delete-btn"
-                        onclick="deleteStudent(${student.id})">
-
-                        Delete
-
-                    </button>
-
-                </td>
-
-            </tr>
+                </tr>
 
             `;
 
@@ -130,10 +121,10 @@ function deleteStudent(id){
 let id = new URLSearchParams(window.location.search).get("id");
 
 if(document.getElementById("name") && id){
-
     loadStudent();
-
 }
+
+
 
 function loadStudent(){
 
