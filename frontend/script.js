@@ -1,5 +1,40 @@
 const API = "http://127.0.0.1:8000/api";
 
+
+function login() {
+
+    let username = document.getElementById("username").value;
+    let password = document.getElementById("password").value;
+
+    let user = {
+        username: username,
+        password: password
+    };
+
+    fetch(API + "/login/", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify(user)
+
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        localStorage.setItem("access", data.access);
+        localStorage.setItem("refresh", data.refresh);
+
+        window.location = "index.html";
+
+    });
+}
+
+
+
 // Display Students
 
 
@@ -9,7 +44,15 @@ if(document.getElementById("studentTable")){
 
 function getStudents(){
 
-    fetch(API + "/students/")
+    fetch(API + "/students/", {
+
+        headers: {
+            "Authorization":
+                "Bearer " + localStorage.getItem("access")
+            }
+
+        }
+    )
 
     .then(response => response.json())
 
@@ -72,10 +115,10 @@ function addStudent(){
 
         method:"POST",
 
-        headers:{
-            "Content-Type":"application/json"
+        headers: {
+        "Content-Type": "application/json",
+        "Authorization":"Bearer " + localStorage.getItem("access")
         },
-
         body:JSON.stringify(student)
 
     })
@@ -87,8 +130,69 @@ function addStudent(){
         window.location="index.html";
 
     });
-
 }
+
+
+function logout() {
+
+    localStorage.removeItem("access");
+    localStorage.removeItem("refresh");
+
+    window.location = "login.html";
+}
+ 
+
+
+function authHeader() {
+
+    return {
+        "Authorization":
+            "Bearer " + localStorage.getItem("access")
+    };
+}
+
+fetch(API + "/students/", {
+    headers: authHeader()
+});
+
+
+function checkLogin() {
+
+    let token = localStorage.getItem("access");
+
+    if (!token) {
+        window.location = "login.html";
+    }
+}
+
+
+function refreshToken() {
+
+    let refresh = localStorage.getItem("refresh");
+
+    return fetch(API + "/auth/refresh/", {
+
+        method: "POST",
+
+        headers: {
+            "Content-Type": "application/json"
+        },
+
+        body: JSON.stringify({
+            refresh: refresh
+        })
+
+    })
+    .then(response => response.json())
+    .then(data => {
+
+        localStorage.setItem("access", data.access);
+
+        return data.access;
+    });
+}
+
+
 
 
 
@@ -100,7 +204,12 @@ function deleteStudent(id){
 
     fetch(API + "/students/delete/" + id + "/",{
 
-        method:"DELETE"
+        method:"DELETE",
+        headers: {
+            "Authorization":
+                "Bearer " + localStorage.getItem("access")
+        }
+
 
     })
 
@@ -167,9 +276,11 @@ function updateStudent(){
 
         method:"PUT",
 
-        headers:{
-            "Content-Type":"application/json"
+        headers: {
+        "Content-Type": "application/json",
+        "Authorization":"Bearer " + localStorage.getItem("access")
         },
+
 
         body:JSON.stringify(student)
 
@@ -184,3 +295,6 @@ function updateStudent(){
     });
 
 }
+
+
+
